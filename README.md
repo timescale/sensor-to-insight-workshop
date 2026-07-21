@@ -16,7 +16,7 @@ A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline o
 
 You need three things before we start. Do these **before May 28** — workshop day is a bad time to debug DNS.
 
-> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below. One thing to set up ahead of time: `tiger auth login`'s normal browser-based OAuth flow doesn't work inside Codespaces (it redirects to `localhost`, which doesn't survive Codespaces' port forwarding) — see the [Codespaces note](#power-user-path-tiger-cli-optional) in the `tiger-cli` section for a one-time fix that avoids it entirely.
+> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below and go straight to signing up for Tiger Cloud, creating a service in the console, and connecting with `psql`. (If you also want to try the optional `tiger-cli` power-user path below, there's a Codespaces-specific note on logging in — but it's not required for the core workshop.)
 
 ### 1. Sign up for Tiger Cloud
 
