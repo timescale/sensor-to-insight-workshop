@@ -16,7 +16,7 @@ A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline o
 
 You need three things before we start. Do these **before May 28** — workshop day is a bad time to debug DNS.
 
-> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below and go straight to signing up for Tiger Cloud, then [logging in with `tiger-cli`](#power-user-path-tiger-cli-optional) or testing your connection.
+> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below. One thing to set up ahead of time: `tiger auth login`'s normal browser-based OAuth flow doesn't work inside Codespaces (it redirects to `localhost`, which doesn't survive Codespaces' port forwarding) — see the [Codespaces note](#power-user-path-tiger-cli-optional) in the `tiger-cli` section for a one-time fix that avoids it entirely.
 
 ### 1. Sign up for Tiger Cloud
 
@@ -80,11 +80,20 @@ brew install --cask timescale/tap/tiger-cli
 irm https://cli.tigerdata.com/install.ps1 | iex
 ```
 
-**Log in** (opens a browser, no API key juggling):
+**Log in:**
 
-```bash
-tiger auth login
-```
+- **Local terminal:** opens a browser for OAuth, no key juggling:
+  ```bash
+  tiger auth login
+  ```
+- **Codespaces:** the OAuth flow redirects to `localhost`, which doesn't survive Codespaces' port forwarding — skip the browser entirely instead. Grab an API key pair from [console.cloud.tigerdata.com/dashboard/settings](https://console.cloud.tigerdata.com/dashboard/settings), then **before the workshop**, add them as your own personal Codespaces secrets (scoped to this repo) at [github.com/settings/codespaces](https://github.com/settings/codespaces):
+  - `TIGER_PUBLIC_KEY`
+  - `TIGER_SECRET_KEY`
+
+  Any Codespace you launch on this repo picks those up automatically, so `tiger auth login` just works — no browser, no typing, no 404s. Forgot to set them up ahead of time? One-line fallback:
+  ```bash
+  tiger auth login --public-key your-public-key --secret-key your-secret-key
+  ```
 
 **Create your workshop service + grab a connection string:**
 
