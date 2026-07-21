@@ -1,5 +1,7 @@
 # From Sensor to Insight: Real-Time IoT Analytics with TimescaleDB
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/timescale/sensor-to-insight-workshop)
+
 A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline on Tiger Cloud from scratch. You write the SQL, you run the queries, and you walk away with a working service you built yourself.
 
 ## What you'll learn
@@ -13,6 +15,8 @@ A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline o
 ## Before the workshop — setup checklist
 
 You need three things before we start. Do these **before May 28** — workshop day is a bad time to debug DNS.
+
+> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below and go straight to signing up for Tiger Cloud, then [logging in with `tiger-cli`](#power-user-path-tiger-cli-optional) or testing your connection.
 
 ### 1. Sign up for Tiger Cloud
 
