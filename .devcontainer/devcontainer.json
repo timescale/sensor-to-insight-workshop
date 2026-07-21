@@ -2,5 +2,8 @@
   "name": "Sensor to Insight Workshop",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "postCreateCommand": "sudo apt-get update && sudo apt-get install -y postgresql-client && curl -fsSL https://cli.tigerdata.com | sh",
+  "remoteEnv": {
+    "PATH": "/home/vscode/bin:${containerEnv:PATH}"
+  },
   "remoteUser": "vscode"
 }
