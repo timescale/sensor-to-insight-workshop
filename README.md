@@ -14,7 +14,7 @@ A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline o
 
 ## Before the workshop — setup checklist
 
-You need three things before we start. Do these **before May 28** — workshop day is a bad time to debug DNS.
+You need three things before we start. Do these **before workshop day** — workshop day is a bad time to debug DNS.
 
 > **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below and go straight to signing up for Tiger Cloud, creating a service in the console, and connecting with `psql`. (If you also want to try the optional `tiger-cli` power-user path below, there's a Codespaces-specific note on logging in — but it's not required for the core workshop.)
 
@@ -59,7 +59,7 @@ A few days before the workshop, run:
 psql "postgres://tsdbadmin:...your-connection-string..." -c "SELECT version();"
 ```
 
-If you see a Postgres version string, you're set. If not, fix it before May 28.
+If you see a Postgres version string, you're set. If not, sort it out before workshop day.
 
 ---
 

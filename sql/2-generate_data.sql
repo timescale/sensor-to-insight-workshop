@@ -17,14 +17,14 @@ INSERT INTO tag_meta (name, device, work_cell, prod_area, units) VALUES
     ;
 
 SELECT * FROM tag_meta;
--- Expected: 10 rows
+-- Expected: 6 rows
 
 
 -- ============================================================================
 -- ## Generate 30 days of sensor data
 -- ============================================================================
--- 4 sensors × 1 reading every 5 seconds × 30 days = ~2.07M rows.
--- On the smallest paid Tiger Cloud SKU this takes ~30–40 seconds.
+-- 6 sensors × 1 reading every second × 30 days = ~15.5M rows.
+-- On the smallest paid Tiger Cloud SKU this takes ~2 minutes.
 INSERT INTO tag_history (time, id, value, quality)
 SELECT
     g1.time,
