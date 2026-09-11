@@ -16,58 +16,60 @@ A 60-minute hands-on workshop where you'll build a real IoT analytics pipeline o
 
 You need three things before we start. Do these **before workshop day** — workshop day is a bad time to debug DNS.
 
-> **Using GitHub Codespaces?** Click the badge above to launch a ready-to-go environment — `psql` and the `tiger` CLI are already installed. You can skip step 3 below and go straight to signing up for Tiger Cloud, creating a service in the console, and connecting with `psql`. (If you also want to try the optional `tiger-cli` power-user path below, there's a Codespaces-specific note on logging in — but it's not required for the core workshop.)
+> **Using GitHub Codespaces?** Click the badge above and you get a terminal with the
+> `tiger` CLI already installed and configured. That's the whole toolchain — every SQL
+> statement in this workshop runs through `tiger db query`, so there is no `psql` to
+> install and no connection string to copy around.
 
 ### 1. Sign up for Tiger Cloud
 
 Sign up at [tsdb.co/sensor-workshop-signup](https://tsdb.co/sensor-workshop-signup). You'll get **$1000 in trial credit**, which is way more than enough for this workshop and a bunch of follow-up experimentation.
 
-### 2. Spin up a service
-
-After signup, create a new service:
-
-- **Type:** PostgreSQL with time-series and analytics
-- **Region:** us-east-1
-- **Compute:** the smallest paid SKU (0.5 CPU / 2 GB) — your trial credits cover this comfortably
-- **Name:** anything you like (e.g. `iot-workshop`)
-
-Once it's up, copy the connection string from the service overview. It looks like:
-
-```
-postgres://tsdbadmin:xxxxxxxx@xxxxxxxxxx.tsdb.cloud.timescale.com:39966/tsdb?sslmode=require
-```
-
-### 3. Install [psql](https://www.tigerdata.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows) (optional)
-
-You can use `psql` for the workshop. You can also use the [**Data** tab in the Tiger Cloud console](https://www.tigerdata.com/docs/build/data-management/run-queries-from-tiger-console#data-view) if you don't want to install anything.
+### 2. Log in to the CLI
 
 ```bash
-# macOS
-brew install libpq && brew link --force libpq
-
-# Ubuntu / Debian
-sudo apt install postgresql-client
+tiger auth login --headless
 ```
 
-Windows: see [How to install psql](https://www.tigerdata.com/blog/how-to-install-psql-on-mac-ubuntu-debian-windows).
+`--headless` prints a short code and a URL. Open the URL in any browser on any machine,
+enter the code, pick your project. This is the flow designed for exactly this situation —
+your terminal is in a container in a datacenter and can't open your browser.
 
-### 4. Test your connection
+Check it worked:
+
+```bash
+tiger service list
+```
+
+### 3. Create your service
+
+```bash
+tiger service create --name iot-workshop --cpu 500 --memory 2
+```
+
+That's the smallest paid SKU (0.5 CPU / 2 GB); your trial credits cover it comfortably.
+This workshop generates about 15.5 million rows, which is more than a free service will
+hold.
+
+**Creating a service also makes it your default**, which is why nothing below needs a
+service ID or a connection string. If you ever need to point at a different service, pass
+its ID: `tiger db query <service-id> -c "..."`.
+
+### 4. Test it
 
 A few days before the workshop, run:
 
 ```bash
-psql "postgres://tsdbadmin:...your-connection-string..." -c "SELECT version();"
+tiger db query -c "SELECT version()"
 ```
 
 If you see a Postgres version string, you're set. If not, sort it out before workshop day.
 
 ---
 
-### Power user path: `tiger-cli` (optional)
+### Not using Codespaces?
 
-If you'd rather do setup from a terminal, [`tiger-cli`](https://github.com/timescale/tiger-cli) does everything the console UI does — and it bundles the MCP server we'll demo at the end of the workshop. Skip this if console + psql works fine for you.
-
-**Install:**
+Everything above works the same on your own machine once the CLI is installed:
 
 ```bash
 # macOS / Linux / WSL
@@ -80,53 +82,49 @@ brew install --cask timescale/tap/tiger-cli
 irm https://cli.tigerdata.com/install.ps1 | iex
 ```
 
-**Log in:**
-
-- **Local terminal:** opens a browser for OAuth, no key juggling:
-  ```bash
-  tiger auth login
-  ```
-- **Codespaces:** the OAuth flow redirects to `localhost`, which doesn't survive Codespaces' port forwarding — skip the browser entirely instead. Grab an API key pair from [console.cloud.tigerdata.com/dashboard/settings](https://console.cloud.tigerdata.com/dashboard/settings), then **before the workshop**, add them as your own personal Codespaces secrets (scoped to this repo) at [github.com/settings/codespaces](https://github.com/settings/codespaces):
-  - `TIGER_PUBLIC_KEY`
-  - `TIGER_SECRET_KEY`
-
-  Any Codespace you launch on this repo picks those up automatically, so `tiger auth login` just works — no browser, no typing, no 404s. Forgot to set them up ahead of time? One-line fallback:
-  ```bash
-  tiger auth login --public-key your-public-key --secret-key your-secret-key
-  ```
-
-**Create your workshop service + grab a connection string:**
-
-```bash
-tiger service create --name iot-workshop
-tiger service list                  # confirm it's up
-tiger db connection-string          # save this for later
-```
-
-**Connect:**
-
-```bash
-tiger db connect
-```
-
-`tiger db connect` shells out to local `psql` — you still need psql installed.
-
-**Heads-up for Linux users:** if you don't have a desktop keyring daemon, `tiger auth login` may fail to save credentials silently. Fix with:
+**On Linux without a desktop keyring**, `tiger auth login` can appear to succeed and then
+every later command fails to read the credentials back. Fix it before logging in:
 
 ```bash
 tiger config set password_storage pgpass
 ```
 
-If `tiger-cli` is installed and logged in by workshop day, you'll be ready for the bonus MCP demo at the end.
+The Codespace does this for you.
+
+**Prefer not to use a terminal at all?** You can run every statement in this workshop from
+the [**Data** tab in the Tiger Cloud console](https://www.tigerdata.com/docs/build/data-management/run-queries-from-tiger-console#data-view)
+instead, and create the service through the console UI rather than the CLI.
 
 ---
 
 ## During the workshop
 
-We'll work through the files in the [`sql`](./sql) directory, step by step. Either:
+We'll work through the files in the [`sql`](./sql) directory, step by step.
 
-- **Recommended:** open each `*.sql` file locally and copy/paste each section into `psql` as we go
-- **Alternative:** paste the whole file into the **Data** tab in the Tiger Cloud console
+**Recommended:** open each `*.sql` file and run one section at a time, so you can read the
+output as we go:
+
+```bash
+tiger db query -c "SELECT * FROM tag_meta"
+```
+
+**To run a whole file at once:**
+
+```bash
+tiger db query -f sql/1-create_tables.sql
+```
+
+Two things worth knowing before you do:
+
+- `sql/2-generate_data.sql` builds ~15.5 million rows and takes about **4 minutes** on the
+  0.5 CPU service. It hasn't hung.
+- `sql/4-continuous_aggregates.sql` is the one file you **can't** run with `-f`.
+  `tiger db query` wraps a multi-statement file in a single transaction, and
+  `CREATE MATERIALIZED VIEW ... WITH DATA` can't run inside one — you'll get
+  `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. Run that file section by
+  section with `-c` and it's fine.
+
+**Alternative:** paste the whole file into the **Data** tab in the Tiger Cloud console.
 
 If you fall behind on a step, the next one will still work — each section is self-contained.
 

@@ -24,7 +24,7 @@ SELECT * FROM tag_meta;
 -- ## Generate 30 days of sensor data
 -- ============================================================================
 -- 6 sensors × 1 reading every second × 30 days = ~15.5M rows.
--- On the smallest paid Tiger Cloud SKU this takes ~2 minutes.
+-- On the smallest paid Tiger Cloud SKU (0.5 CPU / 2 GB) this takes about 4 minutes.
 INSERT INTO tag_history (time, id, value, quality)
 SELECT
     g1.time,
