@@ -55,6 +55,13 @@ hold.
 service ID or a connection string. If you ever need to point at a different service, pass
 its ID: `tiger db query <service-id> -c "..."`.
 
+To make a different service your default instead (for example, one you created before the
+workshop), find its ID with `tiger service list` and set it:
+
+```bash
+tiger config set service_id <service-id>
+```
+
 ### 4. Test it
 
 A few days before the workshop, run:
@@ -102,27 +109,80 @@ instead, and create the service through the console UI rather than the CLI.
 We'll work through the files in the [`sql`](./sql) directory, step by step.
 
 **Recommended:** open each `*.sql` file and run one section at a time, so you can read the
-output as we go:
+output as we go. The easiest way is to [run a selection from the editor](#running-a-selection-from-the-editor);
+you can also paste a statement into the terminal:
 
 ```bash
 tiger db query -c "SELECT * FROM tag_meta"
 ```
 
-**To run a whole file at once:**
+### Running a selection from the editor
+
+In the Codespace (or any VS Code window open on this repo) you don't have to copy SQL into
+the terminal. Highlight the lines you want to run in any `.sql` file, then either:
+
+- press **Ctrl+Shift+B** (**Cmd+Shift+B** on a Mac), or
+- choose **Terminal → Run Build Task…** from the menu.
+
+The highlighted SQL runs through `tiger db query` and the output appears in the terminal
+panel. With nothing highlighted, the whole file runs.
+
+When it finishes, it prints how long the run took (for example `==> Took 0.412s`). That
+includes starting the CLI and the round trip to Tiger Cloud, so it's a rough guide, not the
+query's own execution time.
+
+How it works: [`.vscode/tasks.json`](./.vscode/tasks.json) defines a **Run SQL with Tiger
+CLI** task and makes it the default build task, which is what puts it on Ctrl+Shift+B. The
+task hands the highlighted text to [`.vscode/run-sql.sh`](./.vscode/run-sql.sh), which
+writes it to a temporary file and runs `tiger db query -f` on it. Your SQL never passes
+through the shell, so quotes, semicolons and `$` signs are safe.
+
+Because it uses `-f`, highlighting several statements runs them together in one
+transaction. That's fine for everything except creating the continuous aggregate (see
+below), which is why that statement has a file of its own.
+
+### To run a whole file at once
+
+Copy and paste whichever file you need:
 
 ```bash
 tiger db query -f sql/1-create_tables.sql
 ```
 
-Two things worth knowing before you do:
+```bash
+tiger db query -f sql/2-generate_data.sql   # takes about 4 minutes
+```
+
+```bash
+tiger db query -f sql/3-inspect_hypertables.sql
+```
+
+```bash
+tiger db query -f sql/4a-query_data.sql
+```
+
+```bash
+tiger db query -f sql/4b-create_continuous_aggregate.sql
+```
+
+```bash
+tiger db query -f sql/4c-query_continuous_aggregate.sql
+```
+
+```bash
+tiger db query -f sql/5-data_retention_policy.sql
+```
+
+Two things worth knowing:
 
 - `sql/2-generate_data.sql` builds ~15.5 million rows and takes about **4 minutes** on the
   0.5 CPU service. It hasn't hung.
-- `sql/4-continuous_aggregates.sql` is the one file you **can't** run with `-f`.
-  `tiger db query` wraps a multi-statement file in a single transaction, and
-  `CREATE MATERIALIZED VIEW ... WITH DATA` can't run inside one — you'll get
-  `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. Run that file section by
-  section with `-c` and it's fine.
+- Step 4 is split across three files so that `sql/4b-create_continuous_aggregate.sql`
+  holds a single statement. `tiger db query` runs a file with several statements as one
+  transaction, and creating a continuous aggregate can't happen inside one; you'd get
+  `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. On its own it runs
+  fine. The same applies when highlighting: don't select the `DROP` in `4a` and the
+  `CREATE` in `4b` together.
 
 **Alternative:** paste the whole file into the **Data** tab in the Tiger Cloud console.
 
