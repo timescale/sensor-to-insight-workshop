@@ -134,8 +134,8 @@ writes it to a temporary file and runs `tiger db query -f` on it. Your SQL never
 through the shell, so quotes, semicolons and `$` signs are safe.
 
 Because it uses `-f`, highlighting several statements runs them together in one
-transaction. That's fine everywhere except the `CREATE MATERIALIZED VIEW` statement in
-`sql/4-continuous_aggregates.sql` (see below): highlight that statement on its own.
+transaction. That's fine for everything except creating the continuous aggregate (see
+below), which is why that statement has a file of its own.
 
 ### To run a whole file at once
 
@@ -154,23 +154,31 @@ tiger db query -f sql/3-inspect_hypertables.sql
 ```
 
 ```bash
-# Won't work with -f: run this file section by section instead (see below)
-tiger db query -f sql/4-continuous_aggregates.sql
+tiger db query -f sql/4a-query_data.sql
+```
+
+```bash
+tiger db query -f sql/4b-create_continuous_aggregate.sql
+```
+
+```bash
+tiger db query -f sql/4c-query_continuous_aggregate.sql
 ```
 
 ```bash
 tiger db query -f sql/5-data_retention_policy.sql
 ```
 
-Two things worth knowing before you do:
+Two things worth knowing:
 
 - `sql/2-generate_data.sql` builds ~15.5 million rows and takes about **4 minutes** on the
   0.5 CPU service. It hasn't hung.
-- `sql/4-continuous_aggregates.sql` is the one file you **can't** run with `-f`.
-  `tiger db query` wraps a multi-statement file in a single transaction, and
-  `CREATE MATERIALIZED VIEW ... WITH DATA` can't run inside one — you'll get
-  `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. Run that file section by
-  section (highlight each one and press Ctrl+Shift+B, or paste it into `-c`) and it's fine.
+- Step 4 is split across three files so that `sql/4b-create_continuous_aggregate.sql`
+  holds a single statement. `tiger db query` runs a file with several statements as one
+  transaction, and creating a continuous aggregate can't happen inside one; you'd get
+  `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. On its own it runs
+  fine. The same applies when highlighting: don't select the `DROP` in `4a` and the
+  `CREATE` in `4b` together.
 
 **Alternative:** paste the whole file into the **Data** tab in the Tiger Cloud console.
 
