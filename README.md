@@ -146,7 +146,7 @@ tiger db query -f sql/1-create_tables.sql
 ```
 
 ```bash
-tiger db query -f sql/2-generate_data.sql
+tiger db query -f sql/2-generate_data.sql   # takes about 4 minutes
 ```
 
 ```bash
