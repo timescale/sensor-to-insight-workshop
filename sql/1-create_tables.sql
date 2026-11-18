@@ -39,6 +39,6 @@ CREATE TABLE tag_history (
 --    tsdb.associated_schema = '_timescaledb_internal',
 --    tsdb.associated_table_prefix = '_hyper',
 --    tsdb.orderby = 'time DESC',
---    tsdb.segmentby = 'tag_id',
+--    tsdb.segmentby = 'id',
 --    tsdb.sparse_index = ''
 );
