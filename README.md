@@ -127,6 +127,10 @@ the terminal. Highlight the lines you want to run in any `.sql` file, then eithe
 The highlighted SQL runs through `tiger db query` and the output appears in the terminal
 panel. With nothing highlighted, the whole file runs.
 
+When it finishes, it prints how long the run took (for example `==> Took 0.412s`). That
+includes starting the CLI and the round trip to Tiger Cloud, so it's a rough guide, not the
+query's own execution time.
+
 How it works: [`.vscode/tasks.json`](./.vscode/tasks.json) defines a **Run SQL with Tiger
 CLI** task and makes it the default build task, which is what puts it on Ctrl+Shift+B. The
 task hands the highlighted text to [`.vscode/run-sql.sh`](./.vscode/run-sql.sh), which
