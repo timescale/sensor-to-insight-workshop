@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Ctrl+Shift+B: run the selected SQL (or the whole file) through `tiger db query`.
+      "label": "Run SQL with Tiger CLI",
+      "type": "shell",
+      "command": "bash",
+      "args": ["${workspaceFolder}/.vscode/run-sql.sh", "${file}"],
+      "options": {
+        "env": {
+          "SQL_SELECTION": "${selectedText}"
+        }
+      },
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true,
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}
