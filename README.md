@@ -55,6 +55,13 @@ hold.
 service ID or a connection string. If you ever need to point at a different service, pass
 its ID: `tiger db query <service-id> -c "..."`.
 
+To make a different service your default instead (for example, one you created before the
+workshop), find its ID with `tiger service list` and set it:
+
+```bash
+tiger config set service_id <service-id>
+```
+
 ### 4. Test it
 
 A few days before the workshop, run:
