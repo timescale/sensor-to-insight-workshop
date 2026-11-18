@@ -102,16 +102,57 @@ instead, and create the service through the console UI rather than the CLI.
 We'll work through the files in the [`sql`](./sql) directory, step by step.
 
 **Recommended:** open each `*.sql` file and run one section at a time, so you can read the
-output as we go:
+output as we go. The easiest way is to [run a selection from the editor](#running-a-selection-from-the-editor);
+you can also paste a statement into the terminal:
 
 ```bash
 tiger db query -c "SELECT * FROM tag_meta"
 ```
 
-**To run a whole file at once:**
+### Running a selection from the editor
+
+In the Codespace (or any VS Code window open on this repo) you don't have to copy SQL into
+the terminal. Highlight the lines you want to run in any `.sql` file, then either:
+
+- press **Ctrl+Shift+B** (**Cmd+Shift+B** on a Mac), or
+- choose **Terminal → Run Build Task…** from the menu.
+
+The highlighted SQL runs through `tiger db query` and the output appears in the terminal
+panel. With nothing highlighted, the whole file runs.
+
+How it works: [`.vscode/tasks.json`](./.vscode/tasks.json) defines a **Run SQL with Tiger
+CLI** task and makes it the default build task, which is what puts it on Ctrl+Shift+B. The
+task hands the highlighted text to [`.vscode/run-sql.sh`](./.vscode/run-sql.sh), which
+writes it to a temporary file and runs `tiger db query -f` on it. Your SQL never passes
+through the shell, so quotes, semicolons and `$` signs are safe.
+
+Because it uses `-f`, highlighting several statements runs them together in one
+transaction. That's fine everywhere except the `CREATE MATERIALIZED VIEW` statement in
+`sql/4-continuous_aggregates.sql` (see below): highlight that statement on its own.
+
+### To run a whole file at once
+
+Copy and paste whichever file you need:
 
 ```bash
 tiger db query -f sql/1-create_tables.sql
+```
+
+```bash
+tiger db query -f sql/2-generate_data.sql
+```
+
+```bash
+tiger db query -f sql/3-inspect_hypertables.sql
+```
+
+```bash
+# Won't work with -f: run this file section by section instead (see below)
+tiger db query -f sql/4-continuous_aggregates.sql
+```
+
+```bash
+tiger db query -f sql/5-data_retention_policy.sql
 ```
 
 Two things worth knowing before you do:
@@ -122,7 +163,7 @@ Two things worth knowing before you do:
   `tiger db query` wraps a multi-statement file in a single transaction, and
   `CREATE MATERIALIZED VIEW ... WITH DATA` can't run inside one — you'll get
   `ERROR: cannot run inside a transaction block (SQLSTATE 25001)`. Run that file section by
-  section with `-c` and it's fine.
+  section (highlight each one and press Ctrl+Shift+B, or paste it into `-c`) and it's fine.
 
 **Alternative:** paste the whole file into the **Data** tab in the Tiger Cloud console.
 
